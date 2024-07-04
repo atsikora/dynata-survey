@@ -11,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import hu.endox.demo.csv.CsvResolver;
 import hu.endox.demo.model.Participation;
+import hu.endox.demo.util.CollectionUtil;
 
 @Component
 public class ParticipationRepository implements Repository<Participation> {
@@ -30,11 +31,11 @@ public class ParticipationRepository implements Repository<Participation> {
     }
 
     public List<Participation> findBySurveyId(Long surveyId) {
-        return surveyCache.get(surveyId);
+        return CollectionUtil.nullAsEmptyList(surveyCache.get(surveyId));
     }
 
     public List<Participation> findByMemberId(Long memberId) {
-        return memberCache.get(memberId);
+        return CollectionUtil.nullAsEmptyList(memberCache.get(memberId));
     }
 
     @Override

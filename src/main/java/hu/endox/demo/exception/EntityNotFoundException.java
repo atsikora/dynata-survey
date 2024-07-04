@@ -1,4 +1,4 @@
-package hu.endox.demo.controller;
+package hu.endox.demo.exception;
 
 public class EntityNotFoundException extends RuntimeException {
 

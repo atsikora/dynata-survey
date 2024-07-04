@@ -36,7 +36,7 @@ public final class CsvResolver {
         converters.add(new StatusConverter());
     }
 
-    public static <T> List<T> resolveCsvFile(String fileName, Class<T> clazz) {
+    private static <T> List<T> resolveCsvFile(String fileName, Class<T> clazz) {
         List<T> response = Collections.emptyList();
         List<CsvRecord> membersAsCsv = FastCSVReader.read(fileName);
         Optional<Converter<?>> converterO = converters.stream().filter(c -> c.support(clazz)).findFirst();

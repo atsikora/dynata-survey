@@ -29,8 +29,7 @@ public class SurveyRepository implements Repository<Survey> {
     }
 
     public List<Survey> findAllById(Collection<Long> ids) {
-        //TODO null check, and what to do if null.
-        return ids.stream().map(id -> cache.get(id)).toList();
+        return ids.stream().filter(id -> cache.get(id) != null).map(id -> cache.get(id)).toList();
     }
 
     @Override
