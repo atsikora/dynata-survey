@@ -27,7 +27,9 @@ import hu.endox.demo.statistics.StatisticCollector;
 @Service
 public class SurveyService implements ISurveyService {
 
-    @Autowired
+	private static final List<Long> POINTS_AWARDING_STATUSES = Arrays.asList(SurveyStatus.FILTERED.getCode(), SurveyStatus.COMPLETED.getCode());
+
+	@Autowired
     private SurveyRepository surveyRepository;
 
     @Autowired
@@ -39,7 +41,6 @@ public class SurveyService implements ISurveyService {
     @Autowired
     private StatisticCollector statisticCollector;
 
-    private List<Long> pointsAwardingStatuses = Arrays.asList(SurveyStatus.FILTERED.getCode(), SurveyStatus.COMPLETED.getCode());
 
     @Override
     public List<MemberDTO> getMembersBySurveyIdAndStatus(Long surveyId, Long status) {
@@ -60,7 +61,7 @@ public class SurveyService implements ISurveyService {
     @Override
     public List<PointDTO> getPointsByMemberId(Long memberId) {
         List<Participation> participations = participationRepository.findByMemberId(memberId);
-        List<Participation> eligibleParticipations = participations.stream().filter(p -> pointsAwardingStatuses.contains(p.getStatus())).toList();
+        List<Participation> eligibleParticipations = participations.stream().filter(p -> POINTS_AWARDING_STATUSES.contains(p.getStatus())).toList();
         List<Long> eligibleSurveyIds = eligibleParticipations.stream().map(Participation::getSurveyId).toList();
         List<Survey> surveys = surveyRepository.findAllById(eligibleSurveyIds);
         Map<Long, Survey> surveyMap = surveys.stream().collect(Collectors.toMap(Survey::getId, Function.identity()));
