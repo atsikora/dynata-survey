@@ -3,6 +3,7 @@ package hu.endox.demo.util;
 public final class Preconditions {
 
     public static final String ID_CANNOT_BE_NULL_OR_EMPTY = "id cannot be null or empty!";
+    public static final String STATUS_CANNOT_BE_NULL = "status cannot be null!";
 
     private Preconditions() {
     }

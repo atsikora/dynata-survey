@@ -5,14 +5,12 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import hu.endox.demo.exception.EntityNotFoundException;
 import hu.endox.demo.model.Member;
 import hu.endox.demo.model.Participation;
 import hu.endox.demo.model.Point;
@@ -25,7 +23,7 @@ import hu.endox.demo.repository.SurveyRepository;
 import hu.endox.demo.statistics.StatisticCollector;
 
 @Service
-public class SurveyService {
+public class SurveyService implements ISurveyService {
 
     @Autowired
     private SurveyRepository surveyRepository;
@@ -70,14 +68,6 @@ public class SurveyService {
                         Participation::getMemberId).toList();
         Collection<Member> allMembers = memberRepository.findAllActive();
         return allMembers.stream().filter(m -> !alreadyAskedMemberIds.contains(m.getMemberId())).toList();
-    }
-
-    public Survey findById(Long id) {
-        Optional<Survey> survey = surveyRepository.findById(id);
-        if (survey.isEmpty()) {
-            throw new EntityNotFoundException(Survey.class.getName(), id);
-        }
-        return survey.get();
     }
 
     public List<SurveyStatistics> collectSurveyStatistics() {

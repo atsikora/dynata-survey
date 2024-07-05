@@ -23,23 +23,23 @@ public final class CsvResolver {
 
     private static final Logger LOG = LoggerFactory.getLogger(CsvResolver.class);
 
-    private static List<Converter<?>> converters;
+    private static final List<Converter<?>> CONVERTERS;
 
     private CsvResolver() {
     }
 
     static {
-        converters = new ArrayList<>();
-        converters.add(new MemberConverter());
-        converters.add(new SurveyConverter());
-        converters.add(new ParticipationConverter());
-        converters.add(new StatusConverter());
+        CONVERTERS = new ArrayList<>();
+        CONVERTERS.add(new MemberConverter());
+        CONVERTERS.add(new SurveyConverter());
+        CONVERTERS.add(new ParticipationConverter());
+        CONVERTERS.add(new StatusConverter());
     }
 
     private static <T> List<T> resolveCsvFile(String fileName, Class<T> clazz) {
         List<T> response = Collections.emptyList();
         List<CsvRecord> membersAsCsv = FastCSVReader.read(fileName);
-        Optional<Converter<?>> converterO = converters.stream().filter(c -> c.support(clazz)).findFirst();
+        Optional<Converter<?>> converterO = CONVERTERS.stream().filter(c -> c.support(clazz)).findFirst();
         if (converterO.isPresent()) {
             Converter<?> converter = converterO.get();
             response = (List<T>) membersAsCsv.subList(1, membersAsCsv.size()).stream().map(converter::convert).toList();
