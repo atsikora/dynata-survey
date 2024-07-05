@@ -2,7 +2,7 @@ package hu.endox.demo.model;
 
 public class Member implements Model{
 
-    private Long memberId;
+    private Long id;
     private String fullName;
     private String email;
     private Boolean isActive;
@@ -10,20 +10,22 @@ public class Member implements Model{
     public Member() {
     }
 
-    public Member(Long memberId, String fullName, String email, Boolean isActive) {
+    public Member(Long id, String fullName, String email, Boolean isActive) {
         super();
-        this.memberId = memberId;
+        this.id = id;
         this.fullName = fullName;
         this.email = email;
         this.isActive = isActive;
     }
 
-    public Long getMemberId() {
-        return memberId;
+    @Override
+    public Long getId() {
+        return id;
     }
 
-    public void setMemberId(Long memberId) {
-        this.memberId = memberId;
+    @Override
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public String getFullName() {
@@ -48,11 +50,6 @@ public class Member implements Model{
 
     public void setIsActive(Boolean isActive) {
         this.isActive = isActive;
-    }
-
-    @Override
-    public String toString() {
-        return "Member [memberId=" + memberId + ", fullName=" + fullName + ", email=" + email + ", isActive=" + isActive + "]";
     }
 
 }

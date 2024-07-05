@@ -20,7 +20,7 @@ public class MemberRepository implements Repository<Member> {
 
     public MemberRepository() {
         List<Member> members = CsvResolver.resolveMembers();
-        cache = Collections.unmodifiableMap(members.stream().collect(Collectors.toMap(Member::getMemberId, Function.identity())));
+        cache = Collections.unmodifiableMap(members.stream().collect(Collectors.toMap(Member::getId, Function.identity())));
     }
 
     @Override
