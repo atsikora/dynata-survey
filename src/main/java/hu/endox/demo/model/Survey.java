@@ -1,6 +1,6 @@
 package hu.endox.demo.model;
 
-public class Survey {
+public class Survey implements Model{
 
     private Long id;
     private String name;

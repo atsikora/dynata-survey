@@ -11,11 +11,13 @@ import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import hu.endox.demo.dto.MemberDTO;
+import hu.endox.demo.dto.PointDTO;
+import hu.endox.demo.dto.SurveyDTO;
+import hu.endox.demo.dto.SurveyStatisticsDTO;
 import hu.endox.demo.model.Member;
 import hu.endox.demo.model.Participation;
-import hu.endox.demo.model.Point;
 import hu.endox.demo.model.Survey;
-import hu.endox.demo.model.SurveyStatistics;
 import hu.endox.demo.model.SurveyStatus;
 import hu.endox.demo.repository.MemberRepository;
 import hu.endox.demo.repository.ParticipationRepository;
@@ -39,40 +41,47 @@ public class SurveyService implements ISurveyService {
 
     private List<Long> pointsAwardingStatuses = Arrays.asList(SurveyStatus.FILTERED.getCode(), SurveyStatus.COMPLETED.getCode());
 
-    public List<Member> getMembersBySurveyIdAndStatus(Long surveyId, Long status) {
+    @Override
+    public List<MemberDTO> getMembersBySurveyIdAndStatus(Long surveyId, Long status) {
         List<Participation> participations = participationRepository.findBySurveyId(surveyId);
         List<Long> memberIds = participations.stream().filter(p -> p.getStatus().equals(status)).map(Participation::getMemberId).toList();
-        return memberRepository.findAllById(memberIds);
+        List<Member> members = memberRepository.findAllById(memberIds);
+		return members.stream().map(m -> asMemberDTO(m)).toList();
     }
 
-    public List<Survey> getSurveyByMemberIdAndStatus(Long memberId, Long status) {
+    @Override
+    public List<SurveyDTO> getSurveyByMemberIdAndStatus(Long memberId, Long status) {
         List<Participation> participations = participationRepository.findByMemberId(memberId);
         List<Long> surveyIds = participations.stream().filter(p -> p.getStatus().equals(status)).map(Participation::getSurveyId).toList();
-        return surveyRepository.findAllById(surveyIds);
+        List<Survey> surveys = surveyRepository.findAllById(surveyIds);
+		return surveys.stream().map(s -> asSurveyDTO(s)).toList();
     }
 
-    public List<Point> getPointsByMemberId(Long memberId) {
+    @Override
+    public List<PointDTO> getPointsByMemberId(Long memberId) {
         List<Participation> participations = participationRepository.findByMemberId(memberId);
         List<Participation> eligibleParticipations = participations.stream().filter(p -> pointsAwardingStatuses.contains(p.getStatus())).toList();
         List<Long> eligibleSurveyIds = eligibleParticipations.stream().map(Participation::getSurveyId).toList();
         List<Survey> surveys = surveyRepository.findAllById(eligibleSurveyIds);
         Map<Long, Survey> surveyMap = surveys.stream().collect(Collectors.toMap(Survey::getId, Function.identity()));
-        return eligibleParticipations.stream().map(p -> new Point(p.getSurveyId(), getPointsFromParticipation(p.getStatus(), surveyMap.get(p
+        return eligibleParticipations.stream().map(p -> new PointDTO(p.getSurveyId(), getPointsFromParticipation(p.getStatus(), surveyMap.get(p
                         .getSurveyId())))).toList();
     }
 
-    public List<Member> getInvitableMembersBySurveyId(Long surveyId) {
+    @Override
+    public List<MemberDTO> getInvitableMembersBySurveyId(Long surveyId) {
         List<Participation> participations = participationRepository.findBySurveyId(surveyId);
         //maybe not necessary, because there are no NOT_ASKED records in Participations. 
         List<Long> alreadyAskedMemberIds = participations.stream().filter(p -> !SurveyStatus.NOT_ASKED.getCode().equals(p.getStatus())).map(
                         Participation::getMemberId).toList();
         Collection<Member> allMembers = memberRepository.findAllActive();
-        return allMembers.stream().filter(m -> !alreadyAskedMemberIds.contains(m.getMemberId())).toList();
+        return allMembers.stream().filter(m -> !alreadyAskedMemberIds.contains(m.getMemberId())).map(m -> asMemberDTO(m)).toList();
     }
 
-    public List<SurveyStatistics> collectSurveyStatistics() {
+    @Override
+    public List<SurveyStatisticsDTO> collectSurveyStatistics() {
         Collection<Survey> allSurvey = surveyRepository.findAll();
-        List<SurveyStatistics> response = new ArrayList<>(allSurvey.size());
+        List<SurveyStatisticsDTO> response = new ArrayList<>(allSurvey.size());
         for (Survey survey : allSurvey) {
             List<Participation> participations = participationRepository.findBySurveyId(survey.getId());
             response.add(statisticCollector.collectStatistic(survey, participations));
@@ -89,4 +98,13 @@ public class SurveyService implements ISurveyService {
         }
         return point;
     }
+
+    private MemberDTO asMemberDTO(Member m) {
+    	return new MemberDTO(m.getMemberId(), m.getFullName(), m.getEmail(), m.getIsActive());
+    }
+    
+    private SurveyDTO asSurveyDTO(Survey s) {
+    	return new SurveyDTO(s.getId(), s.getName(), s.getExpectedComplete(), s.getCompletionPoint(), s.getFilteredPoint());
+    }
+
 }

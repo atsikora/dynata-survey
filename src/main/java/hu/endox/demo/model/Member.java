@@ -1,6 +1,6 @@
 package hu.endox.demo.model;
 
-public class Member {
+public class Member implements Model{
 
     private Long memberId;
     private String fullName;

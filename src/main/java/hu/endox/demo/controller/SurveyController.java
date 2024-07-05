@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import hu.endox.demo.model.Member;
-import hu.endox.demo.model.SurveyStatistics;
+import hu.endox.demo.dto.MemberDTO;
+import hu.endox.demo.dto.SurveyStatisticsDTO;
 import hu.endox.demo.model.SurveyStatus;
 import hu.endox.demo.service.ISurveyService;
 import hu.endox.demo.util.Preconditions;
@@ -24,26 +24,26 @@ public class SurveyController {
     private ISurveyService surveyService;
 
     @GetMapping(value = "/{id}/members/completed")
-    public ResponseEntity<List<Member>> getMembersWhoCompletedBySurveyId(@PathVariable("id") Long id) {
+    public ResponseEntity<List<MemberDTO>> getMembersWhoCompletedBySurveyId(@PathVariable("id") Long id) {
         Preconditions.checkPresence(id, Preconditions.ID_CANNOT_BE_NULL_OR_EMPTY);
         return ResponseEntity.ok(surveyService.getMembersBySurveyIdAndStatus(id, SurveyStatus.COMPLETED.getCode()));
     }
 
     @GetMapping(value = "/{id}/members/{status}")
-    public ResponseEntity<List<Member>> getMembersBySurveyIdAndStatus(@PathVariable("id") Long id, @PathVariable("status") Long status) {
+    public ResponseEntity<List<MemberDTO>> getMembersBySurveyIdAndStatus(@PathVariable("id") Long id, @PathVariable("status") Long status) {
         Preconditions.checkPresence(id, Preconditions.ID_CANNOT_BE_NULL_OR_EMPTY);
         Preconditions.checkPresence(status, Preconditions.STATUS_CANNOT_BE_NULL);
         return ResponseEntity.ok(surveyService.getMembersBySurveyIdAndStatus(id, status));
     }
 
     @GetMapping(value = "/{id}/inviteable")
-    public ResponseEntity<List<Member>> getInviteableMembersBySurveyId(@PathVariable("id") Long id) {
+    public ResponseEntity<List<MemberDTO>> getInviteableMembersBySurveyId(@PathVariable("id") Long id) {
         Preconditions.checkPresence(id, Preconditions.ID_CANNOT_BE_NULL_OR_EMPTY);
         return ResponseEntity.ok(surveyService.getInvitableMembersBySurveyId(id));
     }
 
     @GetMapping(value = "/stats")
-    public ResponseEntity<List<SurveyStatistics>> getInviteableMembersBySurveyId() {
+    public ResponseEntity<List<SurveyStatisticsDTO>> getInviteableMembersBySurveyId() {
         return ResponseEntity.ok(surveyService.collectSurveyStatistics());
     }
 
